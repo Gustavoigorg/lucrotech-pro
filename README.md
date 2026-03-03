@@ -13,7 +13,7 @@ g# 💰 LucroTech PRO
 [![Demo](https://lucrutechpro.netlify.app)](https://lucrutechpro.netlify.app)
 
 ## 📱 Instalação
-1. Acesse [lucrutech.netlify.app](https://lucrotechpro.netlify.app/)
+1. Acesse [lucrutechpro.netlify.app](https://lucrotechpro.netlify.app/)
 2. Chrome: Menu > "Instalar app"
 3. Funciona offline!
 
