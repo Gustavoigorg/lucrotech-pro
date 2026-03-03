@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>LucroTech · Teste de Aparelho</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f172a;--bg2:#1e293b;--bg3:#334155;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;
+  --accent:#38bdf8;--green:#34d399;--yellow:#fbbf24;--red:#f87171;
+  --r:12px;--font:'DM Sans',system-ui,sans-serif
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);overflow-x:hidden}
+
+/* PROGRESS BAR */
+.progress-bar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--bg3);z-index:100}
+.progress-fill{height:100%;background:var(--accent);transition:width .4s;border-radius:99px}
+
+/* HEADER */
+.header{background:var(--bg2);border-bottom:1px solid var(--bg3);padding:14px 18px;display:flex;align-items:center;gap:12px}
+.header-icon{font-size:24px}
+.header h1{font-size:20px;font-weight:700}
+.header-sub{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* INTRO */
+.intro{padding:20px 18px}
+.os-info{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:14px;margin-bottom:16px}
+.os-info-row{display:flex;gap:8px;font-size:13px;margin-bottom:5px;color:var(--text2)}
+.os-info-row:last-child{margin-bottom:0}
+.os-info-label{color:var(--text3);min-width:70px;flex-shrink:0}
+.os-info-val{color:var(--text);font-weight:500}
+.intro-desc{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:20px}
+.btn-start{width:100%;padding:16px;background:var(--accent);color:#0f172a;border:none;border-radius:var(--r);font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font)}
+
+/* TESTES */
+.testes-wrap{padding:12px 14px 80px}
+.teste-card{background:var(--bg2);border:1.5px solid var(--bg3);border-radius:var(--r);margin-bottom:8px;overflow:hidden;transition:border-color .3s}
+.teste-card.ok{border-color:var(--green)}
+.teste-card.fail{border-color:var(--red)}
+.teste-card.skip{opacity:.55}
+.teste-header{display:flex;align-items:center;gap:12px;padding:13px;cursor:pointer}
+.teste-icon{font-size:22px;width:36px;text-align:center;flex-shrink:0}
+.teste-info{flex:1}
+.teste-nome{font-size:14px;font-weight:600}
+.teste-desc{font-size:11px;color:var(--text3);margin-top:2px}
+.teste-status{font-size:20px;flex-shrink:0}
+.teste-body{padding:0 13px 13px;display:none}
+.teste-body.visible{display:block}
+
+/* BOTÕES AÇÃO */
+.btn-teste{width:100%;padding:12px;background:var(--accent);color:#0f172a;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);margin-bottom:8px;display:block}
+.btn-ok{background:rgba(52,211,153,.2);color:var(--green);border:1.5px solid var(--green)}
+.btn-fail{background:rgba(248,113,113,.2);color:var(--red);border:1.5px solid var(--red)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.btn-row .btn-ok,.btn-row .btn-fail{margin:0}
+.btn-skip{width:100%;padding:9px;background:none;border:1px solid var(--bg3);border-radius:8px;font-size:12px;color:var(--text3);cursor:pointer;font-family:var(--font)}
+.info-txt{font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5}
+
+/* ============================================
+   TOUCH FULLSCREEN - ESTILO SAMSUNG
+   ============================================ */
+.touch-fs{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;touch-action:none}
+.touch-fs-header{background:#111;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;border-bottom:1px solid #222}
+.touch-fs-title{font-size:15px;font-weight:700;color:#fff}
+.touch-fs-count{font-size:13px;color:#aaa}
+.touch-fs-close{background:#333;border:none;color:#fff;padding:7px 14px;border-radius:8px;font-size:13px;cursor:pointer}
+.touch-fs-grid{flex:1;display:grid;gap:2px;padding:2px;overflow:hidden}
+.touch-fs-cell{background:#1a1a1a;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;-webkit-user-select:none;user-select:none;touch-action:none}
+.touch-fs-cell.hit{background:#00e5ff}
+.touch-fs-cell.hit-all{background:#00ff88}
+.touch-fs-footer{background:#111;padding:12px 16px;display:flex;gap:8px;flex-shrink:0;border-top:1px solid #222}
+.touch-fs-footer button{flex:1;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.touch-btn-ok{background:#00ff88;color:#000}
+.touch-btn-fail{background:#ff4444;color:#fff}
+
+/* DISPLAY */
+.display-tests{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.display-btn{flex:1;min-width:70px;padding:10px 4px;border:1.5px solid var(--bg3);border-radius:8px;background:none;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.display-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.display-tap-hint{font-size:14px;font-weight:700;color:rgba(255,255,255,.8);background:rgba(0,0,0,.5);padding:10px 20px;border-radius:8px;text-align:center;pointer-events:none}
+
+/* CAMERA */
+.cam-wrap{border-radius:var(--r);overflow:hidden;background:#000;position:relative;margin-bottom:10px;aspect-ratio:4/3}
+.cam-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.cam-switch{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 12px;color:#fff;font-size:12px;cursor:pointer;font-family:var(--font)}
+
+/* MIC */
+.audio-meter{height:44px;background:var(--bg3);border-radius:8px;overflow:hidden;position:relative;margin-bottom:10px}
+.audio-bar{height:100%;background:linear-gradient(90deg,var(--green),var(--accent));width:0%;transition:width .08s;border-radius:8px}
+.audio-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text2);pointer-events:none}
+
+/* VIBRA */
+.vibra-pattern{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.vibra-btn{padding:12px;border:1.5px solid var(--bg3);border-radius:8px;background:none;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.vibra-btn:active{background:var(--bg3)}
+
+/* ACCEL */
+.accel-display{background:var(--bg3);border-radius:8px;padding:14px;font-family:monospace;font-size:13px;margin-bottom:10px;line-height:2}
+.accel-val{color:var(--accent);font-weight:700}
+
+/* BATERIA */
+.bat-display{background:var(--bg3);border-radius:8px;padding:16px;margin-bottom:10px}
+.bat-level{font-size:40px;font-weight:700;font-family:monospace;color:var(--green)}
+.bat-bar-wrap{height:10px;background:var(--bg);border-radius:99px;margin:10px 0 8px;overflow:hidden}
+.bat-bar-fill{height:100%;border-radius:99px;transition:width .5s}
+.bat-info{font-size:12px;color:var(--text3);line-height:1.8}
+
+/* CONECTIVIDADE */
+.conn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.conn-item{background:var(--bg3);border-radius:8px;padding:12px;text-align:center}
+.conn-val{font-size:17px;font-weight:700;margin-bottom:3px}
+.conn-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+
+/* LUX */
+.lux-display{background:var(--bg3);border-radius:8px;padding:16px;text-align:center;margin-bottom:10px}
+.lux-val{font-size:36px;font-weight:700;font-family:monospace;color:var(--yellow)}
+.lux-lbl{font-size:12px;color:var(--text3);margin-top:4px}
+
+/* ============================================
+   RESULTADO FINAL
+   ============================================ */
+.resultado-pg{padding:0 0 40px}
+.resultado-hero{padding:28px 18px;text-align:center;border-bottom:1px solid var(--bg3)}
+.resultado-emoji{font-size:60px;margin-bottom:10px}
+.resultado-titulo{font-size:24px;font-weight:700;margin-bottom:4px}
+.resultado-sub{font-size:14px;color:var(--text2);margin-bottom:16px}
+
+/* LAUDO CARD */
+.laudo-card{margin:16px 14px 0;background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);overflow:hidden}
+.laudo-titulo{padding:14px 16px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);border-bottom:1px solid var(--bg3);background:var(--bg3)}
+.laudo-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.04)}
+.laudo-item:last-child{border-bottom:none}
+.laudo-icon{font-size:18px;width:26px;text-align:center;flex-shrink:0}
+.laudo-nome{flex:1;font-size:13px;color:var(--text2)}
+.laudo-badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px}
+.badge-ok{background:rgba(52,211,153,.15);color:var(--green)}
+.badge-fail{background:rgba(248,113,113,.15);color:var(--red)}
+.badge-skip{background:rgba(100,116,139,.15);color:var(--text3)}
+
+/* AÇÕES RESULTADO */
+.resultado-acoes{margin:12px 14px;display:flex;flex-direction:column;gap:8px}
+.btn-wpp-laudo{width:100%;padding:15px;background:#25d366;color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-copiar-laudo{width:100%;padding:13px;background:var(--bg2);border:1.5px solid var(--accent);color:var(--accent);border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-fechar-laudo{width:100%;padding:12px;background:none;border:1px solid var(--bg3);color:var(--text3);border-radius:var(--r);font-size:14px;cursor:pointer;font-family:var(--font)}
+
+.laudo-data{font-size:11px;color:var(--text3);text-align:center;padding:12px 0 0}
+.laudo-salvo-badge{margin:12px 14px 0;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green);display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+
+<!-- TELA INTRO -->
+<div id="tela-intro">
+  <div class="header">
+    <div class="header-icon">🔬</div>
+    <div>
+      <h1>Teste de Aparelho</h1>
+      <div class="header-sub">LucroTech PRO · Checklist técnico</div>
+    </div>
+  </div>
+  <div class="intro">
+    <div class="os-info" id="os-info" style="display:none">
+      <div class="os-info-row"><span class="os-info-label">OS</span><span class="os-info-val" id="info-num">—</span></div>
+      <div class="os-info-row"><span class="os-info-label">Cliente</span><span class="os-info-val" id="info-cliente">—</span></div>
+      <div class="os-info-row"><span class="os-info-label">Aparelho</span><span class="os-info-val" id="info-aparelho">—</span></div>
+      <div class="os-info-row"><span class="os-info-label">Serviço</span><span class="os-info-val" id="info-servico">—</span></div>
+    </div>
+    <p class="intro-desc">Este checklist testa os principais componentes do aparelho. Siga cada etapa e confirme o resultado. O laudo será salvo na OS automaticamente.</p>
+    <button class="btn-start" onclick="iniciarTestes()">▶ Iniciar Testes</button>
+  </div>
+</div>
+
+<!-- TELA TESTES -->
+<div id="tela-testes" style="display:none">
+  <div class="header">
+    <div class="header-icon">🔬</div>
+    <div>
+      <h1>Testes</h1>
+      <div class="header-sub" id="progresso-label">0 de 10 concluídos</div>
+    </div>
+  </div>
+  <div class="testes-wrap" id="testes-wrap"></div>
+</div>
+
+<!-- TELA RESULTADO -->
+<div id="tela-resultado" style="display:none">
+  <div class="header">
+    <div class="header-icon">📋</div>
+    <div><h1>Laudo Técnico</h1><div class="header-sub">Testes finalizados</div></div>
+  </div>
+  <div class="resultado-pg">
+    <div class="resultado-hero">
+      <div class="resultado-emoji" id="res-emoji">✅</div>
+      <div class="resultado-titulo" id="res-titulo">Aprovado</div>
+      <div class="resultado-sub" id="res-sub"></div>
+    </div>
+    <div id="laudo-salvo-info" style="display:none" class="laudo-salvo-badge">✅ Laudo salvo na OS automaticamente</div>
+    <div class="laudo-card">
+      <div class="laudo-titulo">📋 Resultado por componente</div>
+      <div id="res-lista"></div>
+    </div>
+    <div class="laudo-data" id="res-data"></div>
+    <div class="resultado-acoes">
+      <button class="btn-wpp-laudo" onclick="enviarLaudoWpp()">📱 Enviar laudo por WhatsApp</button>
+      <button class="btn-copiar-laudo" onclick="copiarLaudo()">📋 Copiar laudo</button>
+      <button class="btn-fechar-laudo" onclick="window.close()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== PARAMS DA URL =====
+const params = new URLSearchParams(location.search)
+const osData = {
+  numOS: params.get('num') || '',
+  cliente: params.get('c') || '',
+  aparelho: params.get('a') || '',
+  servico: params.get('s') || '',
+  osId: params.get('id') || '',
+  whatsapp: params.get('w') || ''
+}
+
+if (osData.cliente || osData.aparelho) {
+  document.getElementById('os-info').style.display = 'block'
+  document.getElementById('info-num').textContent = osData.numOS ? `OS #${osData.numOS}` : '—'
+  document.getElementById('info-cliente').textContent = osData.cliente || '—'
+  document.getElementById('info-aparelho').textContent = osData.aparelho || '—'
+  document.getElementById('info-servico').textContent = osData.servico || '—'
+}
+
+// ===== ESTADO =====
+const resultados = {}
+let testeAtivo = null
+let streamCam = null
+let micStream = null, micRaf = null
+
+// ===== TESTES =====
+const TESTES = [
+  { id:'touch',        nome:'Tela Touch',              icon:'👆', desc:'Sensibilidade em toda a tela' },
+  { id:'display',      nome:'Display',                 icon:'🖥️', desc:'Manchas, linhas e cores' },
+  { id:'camera',       nome:'Câmera',                  icon:'📷', desc:'Frontal e traseira' },
+  { id:'microfone',    nome:'Microfone',               icon:'🎙️', desc:'Captação de áudio' },
+  { id:'alto_falante', nome:'Alto-falante',            icon:'🔊', desc:'Reprodução de som' },
+  { id:'vibracao',     nome:'Vibração',                icon:'📳', desc:'Motor de vibração' },
+  { id:'acelerometro', nome:'Acelerômetro/Giroscópio', icon:'📐', desc:'Sensores de movimento' },
+  { id:'luz',          nome:'Sensor de Luz',           icon:'💡', desc:'Luminosidade ambiente' },
+  { id:'bateria',      nome:'Bateria',                 icon:'🔋', desc:'Nível e carregamento' },
+  { id:'conectividade',nome:'Conectividade',           icon:'📶', desc:'Wi-Fi, dados e Bluetooth' },
+]
+
+function iniciarTestes() {
+  document.getElementById('tela-intro').style.display = 'none'
+  document.getElementById('tela-testes').style.display = 'block'
+  renderTestes()
+  abrirTeste('touch')
+}
+
+function renderTestes() {
+  document.getElementById('testes-wrap').innerHTML = TESTES.map(t => `
+    <div class="teste-card" id="card-${t.id}">
+      <div class="teste-header" onclick="abrirTeste('${t.id}')">
+        <div class="teste-icon">${t.icon}</div>
+        <div class="teste-info">
+          <div class="teste-nome">${t.nome}</div>
+          <div class="teste-desc">${t.desc}</div>
+        </div>
+        <div class="teste-status" id="status-${t.id}">⬜</div>
+      </div>
+      <div class="teste-body" id="body-${t.id}"></div>
+    </div>`).join('')
+}
+
+function abrirTeste(id) {
+  if (testeAtivo && testeAtivo !== id) {
+    document.getElementById(`body-${testeAtivo}`).classList.remove('visible')
+    pararRecursos(testeAtivo)
+  }
+  testeAtivo = id
+  const body = document.getElementById(`body-${id}`)
+  body.innerHTML = getTesteHTML(id)
+  body.classList.add('visible')
+  iniciarRecursos(id)
+  setTimeout(() => document.getElementById(`card-${id}`).scrollIntoView({ behavior:'smooth', block:'nearest' }), 100)
+}
+
+function pararRecursos(id) {
+  if (id === 'camera' && streamCam) { streamCam.getTracks().forEach(t=>t.stop()); streamCam = null }
+  if (id === 'microfone') pararMic()
+  if (id === 'acelerometro') {
+    if (window._accelH) { window.removeEventListener('devicemotion', window._accelH); window._accelH = null }
+    if (window._gyroH) { window.removeEventListener('deviceorientation', window._gyroH); window._gyroH = null }
+  }
+  if (id === 'luz' && window._luxSensor) { try{ window._luxSensor.stop() }catch(e){} window._luxSensor = null }
+}
+
+function setResultado(id, res) {
+  resultados[id] = res
+  const icons = { ok:'✅', fail:'❌', skip:'⏭️' }
+  document.getElementById(`status-${id}`).textContent = icons[res]
+  const card = document.getElementById(`card-${id}`)
+  card.classList.remove('ok','fail','skip')
+  card.classList.add(res)
+  document.getElementById(`body-${id}`).classList.remove('visible')
+  pararRecursos(id)
+  testeAtivo = null
+  atualizarProgresso()
+  const idx = TESTES.findIndex(t => t.id === id)
+  if (idx < TESTES.length - 1) {
+    setTimeout(() => abrirTeste(TESTES[idx+1].id), 250)
+  } else {
+    setTimeout(mostrarResultado, 400)
+  }
+}
+
+function atualizarProgresso() {
+  const done = Object.keys(resultados).length
+  document.getElementById('progress').style.width = (done / TESTES.length * 100) + '%'
+  document.getElementById('progresso-label').textContent = `${done} de ${TESTES.length} concluídos`
+}
+
+// ================================================================
+//  HTML DE CADA TESTE
+// ================================================================
+function getTesteHTML(id) {
+  switch(id) {
+    case 'touch':        return htmlTouch()
+    case 'display':      return htmlDisplay()
+    case 'camera':       return htmlCamera()
+    case 'microfone':    return htmlMic()
+    case 'alto_falante': return htmlAltoFalante()
+    case 'vibracao':     return htmlVibracao()
+    case 'acelerometro': return htmlAcelerometro()
+    case 'luz':          return htmlLuz()
+    case 'bateria':      return htmlBateria()
+    case 'conectividade':return htmlConectividade()
+    default: return ''
+  }
+}
+
+// ================================================================
+//  TOUCH — ESTILO SAMSUNG, TELA INTEIRA
+// ================================================================
+function htmlTouch() {
+  return `<p class="info-txt">Toque no botão para abrir o teste em tela cheia. Todos os quadrados devem ser tocados.</p>
+    <button class="btn-teste" onclick="abrirTouchFS()" style="background:var(--accent);color:#000;margin-bottom:0">👆 Abrir Teste de Touch</button>`
+}
+
+let _touchCols = 7, _touchRows = 12
+let _touchTotal = 0, _touchHit = new Set()
+
+function abrirTouchFS() {
+  _touchCols = 7; _touchRows = 12; _touchTotal = _touchCols * _touchRows
+  _touchHit = new Set()
+
+  const cells = Array.from({length: _touchTotal}, (_,i) =>
+    `<div class="touch-fs-cell" data-i="${i}"></div>`
+  ).join('')
+
+  const fs = document.createElement('div')
+  fs.id = 'touch-fs'
+  fs.className = 'touch-fs'
+  fs.innerHTML = `
+    <div class="touch-fs-header">
+      <div>
+        <div class="touch-fs-title">👆 Teste de Touch</div>
+        <div class="touch-fs-count" id="touch-count">Toque em TODOS os quadrados (0/${_touchTotal})</div>
+      </div>
+      <button class="touch-fs-close" onclick="fecharTouchFS()">✕ Sair</button>
+    </div>
+    <div class="touch-fs-grid" id="touch-grid" style="grid-template-columns:repeat(${_touchCols},1fr)">${cells}</div>
+    <div class="touch-fs-footer">
+      <button class="touch-fs-footer button touch-btn-fail" onclick="fecharTouchFS();setResultado('touch','fail')" style="background:#ff4444;color:#fff">❌ Com defeito</button>
+      <button id="touch-btn-ok" class="touch-fs-footer button touch-btn-ok" onclick="fecharTouchFS();setResultado('touch','ok')" style="background:#333;color:#666;flex:1;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit" disabled>✅ Aprovado</button>
+    </div>`
+  document.body.appendChild(fs)
+
+  // Touch e mouse events na grid
+  const grid = document.getElementById('touch-grid')
+
+  function hitCell(e) {
+    e.preventDefault()
+    const touches = e.changedTouches || [e]
+    Array.from(touches).forEach(t => {
+      const el = document.elementFromPoint(t.clientX, t.clientY)
+      if (el && el.dataset.i !== undefined && !el.classList.contains('hit')) {
+        const i = parseInt(el.dataset.i)
+        el.classList.add('hit')
+        _touchHit.add(i)
+        atualizarTouchCount()
+      }
+    })
+  }
+
+  grid.addEventListener('touchstart', hitCell, { passive: false })
+  grid.addEventListener('touchmove', hitCell, { passive: false })
+  grid.addEventListener('mousedown', hitCell)
+  grid.addEventListener('mousemove', e => { if (e.buttons > 0) hitCell(e) })
+
+  // Tenta fullscreen
+  if (fs.requestFullscreen) fs.requestFullscreen().catch(() => {})
+}
+
+function atualizarTouchCount() {
+  const n = _touchHit.size
+  const count = document.getElementById('touch-count')
+  if (count) count.textContent = `Toque em TODOS os quadrados (${n}/${_touchTotal})`
+
+  if (n >= _touchTotal) {
+    // Todos tocados — muda cor de tudo para verde e habilita aprovado
+    document.querySelectorAll('.touch-fs-cell.hit').forEach(el => el.classList.add('hit-all'))
+    const btn = document.getElementById('touch-btn-ok')
+    if (btn) {
+      btn.style.background = '#00ff88'
+      btn.style.color = '#000'
+      btn.disabled = false
+    }
+  }
+}
+
+function fecharTouchFS() {
+  const fs = document.getElementById('touch-fs')
+  if (fs) fs.remove()
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
+}
+
+// ================================================================
+//  DISPLAY
+// ================================================================
+function htmlDisplay() {
+  return `<p class="info-txt">Toque em cada cor para preencher a tela inteira. Verifique manchas, linhas ou pixels mortos.</p>
+    <div class="display-tests">
+      <button class="display-btn" style="background:#fff;color:#000" onclick="testarCor('#fff','Branco')">Branco</button>
+      <button class="display-btn" style="background:#111;color:#fff;border-color:#333" onclick="testarCor('#111','Preto')">Preto</button>
+      <button class="display-btn" style="background:#f00;color:#fff" onclick="testarCor('#f00','Vermelho')">Vermelho</button>
+      <button class="display-btn" style="background:#0f0;color:#000" onclick="testarCor('#0f0','Verde')">Verde</button>
+      <button class="display-btn" style="background:#00f;color:#fff" onclick="testarCor('#00f','Azul')">Azul</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn-teste btn-ok" onclick="setResultado('display','ok')">✅ Sem defeitos</button>
+      <button class="btn-teste btn-fail" onclick="setResultado('display','fail')">❌ Com defeito</button>
+    </div>
+    <button class="btn-skip" onclick="setResultado('display','skip')">Pular</button>`
+}
+function testarCor(cor, nome) {
+  const d = document.createElement('div')
+  d.className = 'display-overlay'
+  d.style.background = cor
+  d.innerHTML = `<div class="display-tap-hint">Toque para fechar · ${nome}</div>`
+  d.onclick = () => d.remove()
+  document.body.appendChild(d)
+  if (d.requestFullscreen) d.requestFullscreen().catch(()=>{})
+}
+
+// ================================================================
+//  CÂMERA
+// ================================================================
+let camFront = false
+function htmlCamera() {
+  return `<div class="cam-wrap"><video id="cam-video" autoplay playsinline muted></video>
+    <button class="cam-switch" onclick="trocarCamera()">🔄 Trocar câmera</button></div>
+    <p class="info-txt">Verifique foco, imagem clara e autofoco nas duas câmeras.</p>
+    <div class="btn-row">
+      <button class="btn-teste btn-ok" onclick="setResultado('camera','ok')">✅ Funcionou</button>
+      <button class="btn-teste btn-fail" onclick="setResultado('camera','fail')">❌ Com defeito</button>
+    </div>
+    <button class="btn-skip" onclick="setResultado('camera','skip')">Pular</button>`
+}
+async function iniciarCamera() {
+  try {
+    streamCam = await navigator.mediaDevices.getUserMedia({ video:{ facingMode: camFront?'user':'environment' }, audio:false })
+    const v = document.getElementById('cam-video'); if(v) v.srcObject = streamCam
+  } catch(e) { console.log(e) }
+}
+async function trocarCamera() {
+  if (streamCam) streamCam.getTracks().forEach(t=>t.stop())
+  camFront = !camFront; await iniciarCamera()
+}
+
+// ================================================================
+//  MICROFONE
+// ================================================================
+function htmlMic() {
+  return `<div class="audio-meter"><div class="audio-bar" id="mic-bar"></div><div class="audio-label" id="mic-label">Aguardando permissão...</div></div>
+    <p class="info-txt">Fale próximo ao microfone. A barra deve se mover.</p>
+    <div class="btn-row">
+      <button class="btn-teste btn-ok" onclick="setResultado('microfone','ok')">✅ Captando</button>
+      <button class="btn-teste btn-fail" onclick="setResultado('microfone','fail')">❌ Sem áudio</button>
+    </div>
+    <button class="btn-skip" onclick="setResultado('microfone','skip')">Pular</button>`
+}
+async function iniciarMic() {
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio:true })
+    const ctx = new AudioContext(), src = ctx.createMediaStreamSource(micStream)
+    const analyser = ctx.createAnalyser(); analyser.fftSize = 256
+    src.connect(analyser)
+    const buf = new Uint8Array(analyser.frequencyBinCount)
+    const lbl = document.getElementById('mic-label'); if(lbl) lbl.textContent = 'Fale no microfone...'
+    const tick = () => {
+      micRaf = requestAnimationFrame(tick)
+      analyser.getByteFrequencyData(buf)
+      const avg = buf.reduce((a,b)=>a+b)/buf.length
+      const bar = document.getElementById('mic-bar'); if(bar) bar.style.width = Math.min(avg*2.5,100)+'%'
+    }
+    tick()
+  } catch(e) { const l=document.getElementById('mic-label'); if(l) l.textContent='Permissão negada' }
+}
+function pararMic() {
+  if (micRaf) cancelAnimationFrame(micRaf)
+  if (micStream) micStream.getTracks().forEach(t=>t.stop())
+  micStream = null; micRaf = null
+}
+
+// ================================================================
+//  ALTO-FALANTE
+// ================================================================
+function htmlAltoFalante() {
+  return `<p class="info-txt">Suba o volume do aparelho ao máximo. Toque no botão para tocar o som.</p>
+    <button class="btn-teste" onclick="tocarSom()" style="margin-bottom:12px">🔊 Tocar som de teste</button>
+    <div class="btn-row">
+      <button class="btn-teste btn-ok" onclick="setResultado('alto_falante','ok')">✅ Tocou bem</button>
+      <button class="btn-teste btn-fail" onclick="setResultado('alto_falante','fail')">❌ Sem som</button>
+    </div>
+    <button class="btn-skip" onclick="setResultado('alto_falante','skip')">Pular</button>`
+}
+function tocarSom() {
+  try {
+    const ctx = new AudioContext()
+    const notas = [261,329,392,523,659,784,1046]
+    notas.forEach((freq, i) => {
+      const osc = ctx.createOscillator(), g = ctx.createGain()
+      osc.connect(g); g.connect(ctx.destination)
+      osc.frequency.value = freq
+      g.gain.setValueAtTime(0, ctx.currentTime + i*0.14)
+      g.gain.linearRampToValueAtTime(0.3, ctx.currentTime + i*0.14 + 0.05)
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.14 + 0.2)
+      osc.start(ctx.currentTime + i*0.14)
+      osc.stop(ctx.currentTime + i*0.14 + 0.2)
+    })
+  } catch(e) {}
+}
+
+// ================================================================
+//  VIBRAÇÃO
+// ================================================================
+function htmlVibracao() {
+  return `<p class="info-txt">Teste o motor de vibração. Segure o aparelho e toque nos padrões.</p>
+    <div class="vibra-pattern">
+      <button class="vibra-btn" onclick="vibrar([200])">📳 Curta</button>
+      <button class="vibra-btn" onclick="vibrar([600])">📳 Longa</button>
+      <button class="vibra-btn" onclick="vibrar([100,60,100,60,100])">📳 Pulso 3x</button>
+      <button class="vibra-btn" onclick="vibrar([200,80,200,80,400,80,600])">📳 Alarme</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn-teste btn-ok" onclick="setResultado('vibracao','ok')">✅ Vibrou</button>
+      <button class="btn-teste btn-fail" onclick="setResultado('vibracao','fail')">❌ Não vibrou</button>
+    </div>
+    <button class="btn-skip" onclick="setResultado('vibracao','skip')">Pular</button>`
+}
+function vibrar(p) {
+  if ('vibrate' in navigator) navigator.vibrate(p)
+  else alert('Vibração não disponível neste navegador')
+}
+
+// ================================================================
+//  ACELERÔMETRO
+// ================================================================
+function htmlAcelerometro() {
+  return `<div class="accel-display" id="accel-box">
+      <div>Aceleração X: <span class="accel-val" id="acc-x">—</span></div>
+      <div>Aceleração Y: <span class="accel-val" id="acc-y">—</span></div>
+      <div>Aceleração Z: <span class="accel-val" id="acc-z">—</span></div>
+      <div>Rotação α: <span class="accel-val" id="rot-a">—</span></div>
+      <div>Rotação β: <span class="accel-val" id="rot-b">—</span></div>
+      <div>Rotação γ: <span class="accel-val" id="rot-g">—</span></div>
+    </div>
+    <p class="info-txt">Mova e rotacione o aparelho. Os valores devem mudar.</p>
+    <div class="btn-row">
+      <button class="btn-teste btn-ok" onclick="setResultado('acelerometro','ok')">✅ Funcionou</button>
+      <button class="btn-teste btn-fail" onclick="setResultado('acelerometro','fail')">❌ Sem resposta</button>
+    </div>
+    <button class="btn-skip" onclick="setResultado('acelerometro','skip')">Pular</button>`
+}
+function iniciarAcelerometro() {
+  window._accelH = e => {
+    const g = e.accelerationIncludingGravity||{}
+    const set = (id,v) => { const el=document.getElementById(id); if(el&&v!=null) el.textContent=v.toFixed(2) }
+    set('acc-x',g.x); set('acc-y',g.y); set('acc-z',g.z)
+  }
+  window._gyroH = e => {
+    const set = (id,v) => { const el=document.getElementById(id); if(el&&v!=null) el.textContent=v.toFixed(1) }
+    set('rot-a',e.alpha); set('rot-b',e.beta); set('rot-g',e.gamma)
+  }
+  // iOS 13+ precisa de permissão
+  if (typeof DeviceMotionEvent?.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission().then(() => {
+      window.addEventListener('devicemotion', window._accelH)
+      window.addEventListener('deviceorientation', window._gyroH)
+    }).catch(() => {})
+  } else {
+    window.addEventListener('devicemotion', window._accelH)
+    window.addEventListener('deviceorientation', window._gyroH)
+  }
+}
+
+// ================================================================
+//  LUZ
+// ================================================================
+function htmlLuz() {
+  return `<div class="lux-display"><div class="lux-val" id="lux-val">—</div><div class="lux-lbl">lux (luminosidade)</div></div>
+    <p class="info-txt" id="lux-status">Cubra e descubra o sensor de luz. O valor deve mudar.</p>
+    <div class="btn-row">
+      <button class="btn-teste btn-ok" onclick="setResultado('luz','ok')">✅ Funcionou</button>
+      <button class="btn-teste btn-fail" onclick="setResultado('luz','fail')">❌ Sem resposta</button>
+    </div>
+    <button class="btn-skip" onclick="setResultado('luz','skip')">Pular</button>`
+}
+function iniciarLuz() {
+  if ('AmbientLightSensor' in window) {
+    try {
+      const sensor = new AmbientLightSensor()
+      sensor.onreading = () => { const v=document.getElementById('lux-val'); if(v) v.textContent=sensor.illuminance.toFixed(0) }
+      sensor.onerror = () => { const s=document.getElementById('lux-status'); if(s) s.textContent='Sensor não disponível neste aparelho.' }
+      sensor.start(); window._luxSensor = sensor
+    } catch(e) { const s=document.getElementById('lux-status'); if(s) s.textContent='API não suportada. Use como referência o brilho automático da tela.' }
+  } else {
+    const v=document.getElementById('lux-val'); if(v) v.textContent='N/A'
+    const s=document.getElementById('lux-status'); if(s) s.textContent='Sensor não disponível via browser. Verifique se o brilho automático da tela funciona.'
+  }
+}
+
+// ================================================================
+//  BATERIA
+// ================================================================
+function htmlBateria() {
+  return `<div class="bat-display" id="bat-display">
+      <div class="bat-level" id="bat-level">—%</div>
+      <div class="bat-bar-wrap"><div class="bat-bar-fill" id="bat-bar" style="width:0%;background:var(--green)"></div></div>
+      <div class="bat-info" id="bat-info">Carregando informações...</div>
+    </div>
+    <p class="info-txt">Verifique o nível e se o carregamento está funcionando corretamente.</p>
+    <div class="btn-row">
+      <button class="btn-teste btn-ok" onclick="setResultado('bateria','ok')">✅ Normal</button>
+      <button class="btn-teste btn-fail" onclick="setResultado('bateria','fail')">❌ Com problema</button>
+    </div>
+    <button class="btn-skip" onclick="setResultado('bateria','skip')">Pular</button>`
+}
+async function iniciarBateria() {
+  try {
+    const bat = await navigator.getBattery()
+    const atualizar = () => {
+      const pct = Math.round(bat.level*100)
+      const cor = pct > 50 ? 'var(--green)' : pct > 20 ? 'var(--yellow)' : 'var(--red)'
+      const lv = document.getElementById('bat-level'); if(lv){ lv.textContent=pct+'%'; lv.style.color=cor }
+      const bar = document.getElementById('bat-bar'); if(bar){ bar.style.width=pct+'%'; bar.style.background=cor }
+      const info = document.getElementById('bat-info')
+      if(info) info.innerHTML = `Status: <strong>${bat.charging?'⚡ Carregando':'🔋 Descarregando'}</strong><br>
+        ${bat.chargingTime&&bat.chargingTime!==Infinity?`Tempo para carregar: ~${Math.round(bat.chargingTime/60)} min<br>`:''}
+        ${bat.dischargingTime&&bat.dischargingTime!==Infinity?`Autonomia: ~${Math.round(bat.dischargingTime/60)} min`:''}`
+    }
+    atualizar()
+    bat.onlevelchange = atualizar; bat.onchargingchange = atualizar
+  } catch(e) { const info=document.getElementById('bat-info'); if(info) info.textContent='Não disponível' }
+}
+
+// ================================================================
+//  CONECTIVIDADE
+// ================================================================
+function htmlConectividade() {
+  const conn = navigator.connection||navigator.mozConnection||navigator.webkitConnection
+  const online = navigator.onLine
+  const tipo = conn?.effectiveType?.toUpperCase() || '—'
+  const dl = conn?.downlink ? conn.downlink+' Mbps' : '—'
+  return `<div class="conn-grid">
+      <div class="conn-item"><div class="conn-val" style="color:${online?'var(--green)':'var(--red)'}">${online?'✅ Online':'❌ Offline'}</div><div class="conn-label">Internet</div></div>
+      <div class="conn-item"><div class="conn-val">${tipo}</div><div class="conn-label">Rede</div></div>
+      <div class="conn-item"><div class="conn-val">${dl}</div><div class="conn-label">Velocidade</div></div>
+      <div class="conn-item"><div class="conn-val" id="bt-val">—</div><div class="conn-label">Bluetooth</div></div>
+    </div>
+    <p class="info-txt">Verifique se está conectado à rede correta do cliente.</p>
+    <div class="btn-row">
+      <button class="btn-teste btn-ok" onclick="setResultado('conectividade','ok')">✅ Normal</button>
+      <button class="btn-teste btn-fail" onclick="setResultado('conectividade','fail')">❌ Problema</button>
+    </div>
+    <button class="btn-skip" onclick="setResultado('conectividade','skip')">Pular</button>`
+}
+function iniciarConectividade() {
+  const el = document.getElementById('bt-val')
+  if (!el) return
+  el.textContent = 'bluetooth' in navigator ? '✅ Disp.' : 'N/A'
+}
+
+// ================================================================
+//  INICIAR RECURSOS
+// ================================================================
+function iniciarRecursos(id) {
+  const map = {
+    camera: () => setTimeout(iniciarCamera, 100),
+    microfone: () => setTimeout(iniciarMic, 100),
+    acelerometro: () => setTimeout(iniciarAcelerometro, 100),
+    luz: () => setTimeout(iniciarLuz, 100),
+    bateria: () => setTimeout(iniciarBateria, 100),
+    conectividade: () => setTimeout(iniciarConectividade, 100),
+  }
+  if (map[id]) map[id]()
+}
+
+// ================================================================
+//  RESULTADO FINAL + SALVAR NA OS
+// ================================================================
+function mostrarResultado() {
+  // Para tudo
+  TESTES.forEach(t => pararRecursos(t.id))
+  document.getElementById('progress').style.width = '100%'
+  document.getElementById('tela-testes').style.display = 'none'
+  document.getElementById('tela-resultado').style.display = 'block'
+
+  const oks   = TESTES.filter(t => resultados[t.id] === 'ok').length
+  const fails = TESTES.filter(t => resultados[t.id] === 'fail').length
+  const agora = new Date().toLocaleString('pt-BR')
+
+  document.getElementById('res-emoji').textContent = fails===0 ? '✅' : fails<=2 ? '⚠️' : '❌'
+  document.getElementById('res-titulo').textContent = fails===0 ? 'Aprovado' : fails<=2 ? 'Aprovado com ressalvas' : 'Reprovado'
+  document.getElementById('res-sub').textContent = `${oks} aprovados · ${fails} com defeito · ${TESTES.length-oks-fails} não testados`
+
+  const iconRes = { ok:'✅', fail:'❌', skip:'⏭️' }
+  const labelRes = { ok:'Aprovado', fail:'Com defeito', skip:'Não testado' }
+  const badgeClass = { ok:'badge-ok', fail:'badge-fail', skip:'badge-skip' }
+
+  document.getElementById('res-lista').innerHTML = TESTES.map(t => {
+    const r = resultados[t.id] || 'skip'
+    return `<div class="laudo-item">
+      <div class="laudo-icon">${t.icon}</div>
+      <div class="laudo-nome">${t.nome}</div>
+      <span class="laudo-badge ${badgeClass[r]}">${iconRes[r]} ${labelRes[r]}</span>
+    </div>`
+  }).join('')
+
+  document.getElementById('res-data').textContent = `Laudo gerado em ${agora}`
+
+  // Salva na OS via localStorage
+  const laudoTexto = gerarTextoLaudo(agora)
+  window._laudoTexto = laudoTexto
+  window._laudoAgora = agora
+
+  // ============================================================
+  // SALVA LAUDO — 4 estratégias em ordem de confiabilidade
+  // ============================================================
+  const laudoPayload = {
+    osId:      osData.osId,
+    data:      agora,
+    resultados:{ ...resultados },
+    aprovado:  fails === 0,
+    texto:     laudoTexto
+  }
+
+  let salvou = false
+
+  // 1) MELHOR: salva direto no localStorage (iframe e pai compartilham)
+  try {
+    const historico = JSON.parse(localStorage.getItem('lt_historico') || '[]')
+    const idx = historico.findIndex(o => o.id === osData.osId)
+    if (idx !== -1) {
+      historico[idx].laudoTecnico = laudoPayload
+      historico[idx].status = 'pronta'
+      localStorage.setItem('lt_historico', JSON.stringify(historico))
+      salvou = true
+    }
+  } catch(e) {}
+
+  // 2) postMessage para o app pai (iframe → index.html)
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'LAUDO_PRONTO', payload: laudoPayload }, '*')
+    }
+  } catch(e) {}
+
+  // 3) BroadcastChannel
+  try {
+    const ch = new BroadcastChannel('lucrotech_laudo')
+    ch.postMessage({ type: 'LAUDO_PRONTO', payload: laudoPayload })
+    setTimeout(() => ch.close(), 3000)
+  } catch(e) {}
+
+  // 4) Chave pendente — app lê quando fechar o iframe ou voltar ao foco
+  try {
+    localStorage.setItem('lt_laudo_pendente', JSON.stringify(laudoPayload))
+  } catch(e) {}
+
+  if (salvou) {
+    document.getElementById('laudo-salvo-info').style.display = 'flex'
+  } else if (osData.osId) {
+    document.getElementById('laudo-salvo-info').style.display = 'flex'
+    document.getElementById('laudo-salvo-info').textContent = '⏳ Laudo será salvo ao fechar o teste'
+  }
+}
+
+// ================================================================
+//  LAUDO TEXTO
+// ================================================================
+function gerarTextoLaudo(data) {
+  data = data || new Date().toLocaleString('pt-BR')
+  const iconRes = { ok:'✅', fail:'❌', skip:'⏭️' }
+  const labelRes = { ok:'OK', fail:'DEFEITO', skip:'Não testado' }
+  const linhas = TESTES.map(t => `${iconRes[resultados[t.id]||'skip']} ${t.nome}: ${labelRes[resultados[t.id]||'skip']}`).join('\n')
+  const oks = TESTES.filter(t => resultados[t.id]==='ok').length
+  const fails = TESTES.filter(t => resultados[t.id]==='fail').length
+  const num = osData.numOS ? `OS #${osData.numOS}` : ''
+  const status = fails===0 ? '✅ APROVADO' : fails<=2 ? '⚠️ APROVADO COM RESSALVAS' : '❌ REPROVADO'
+  return `🔬 *Laudo Técnico - LucroTech PRO*\n${num ? `\n${num}` : ''}\n👤 ${osData.cliente||'—'}\n📱 ${osData.aparelho||'—'}\n\n${linhas}\n\n*Resultado: ${status}*\n(${oks} OK · ${fails} defeito)\n\n📅 ${data}`
+}
+
+function copiarLaudo() {
+  const texto = window._laudoTexto || gerarTextoLaudo()
+  if (navigator.share) {
+    navigator.share({ text: texto }).catch(() => _copiarFallback(texto))
+  } else {
+    _copiarFallback(texto)
+  }
+}
+
+function _copiarFallback(texto) {
+  navigator.clipboard.writeText(texto)
+    .then(() => { alert('✅ Laudo copiado!\n\nAgora abra o WhatsApp, cole e envie.') })
+    .catch(() => {
+      // Fallback: textarea visível
+      const ta = document.createElement('textarea')
+      ta.value = texto
+      ta.style.cssText = 'position:fixed;bottom:0;left:0;right:0;height:40vh;z-index:9999;padding:16px;font-size:13px;background:#1e293b;color:#f1f5f9;border:none;border-top:2px solid #38bdf8'
+      ta.readOnly = true
+      document.body.appendChild(ta)
+      ta.focus(); ta.select()
+      const btn = document.createElement('button')
+      btn.textContent = '✕ Fechar'
+      btn.style.cssText = 'position:fixed;bottom:calc(40vh + 8px);right:16px;z-index:9999;padding:8px 16px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer'
+      btn.onclick = () => { ta.remove(); btn.remove() }
+      document.body.appendChild(btn)
+    })
+}
+
+function enviarLaudoWpp() {
+  const texto = window._laudoTexto || gerarTextoLaudo()
+  const num = osData.whatsapp
+    ? `https://wa.me/55${osData.whatsapp.replace(/\D/g,'')}?text=`
+    : 'https://wa.me/?text='
+  window.open(num + encodeURIComponent(texto), '_blank')
+}
+</script>
+</body>
+</html>

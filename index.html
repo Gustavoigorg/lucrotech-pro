@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>LucroTech PRO</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=13">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <button class="hamburger" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="topbar-brand">
+    <img src="icon-192.png" class="topbar-icon" alt="LucroTech">
+    <span class="topbar-title">LucroTech</span>
+    <span class="nav-badge">PRO</span>
+  </div>
+  <div class="topbar-right" id="topbar-page-name">Dashboard</div>
+</header>
+
+<div class="drawer-overlay" id="drawer-overlay" onclick="fecharDrawer()"></div>
+
+<aside class="drawer" id="drawer">
+  <div class="drawer-header">
+    <img src="icon-192.png" class="drawer-logo" alt="LucroTech">
+    <div>
+      <div class="drawer-app-name">LucroTech <span class="nav-badge">PRO</span></div>
+      <div class="drawer-app-sub">Gestão de assistência técnica</div>
+    </div>
+  </div>
+  <nav class="drawer-nav">
+    <button class="drawer-item active" onclick="abrirTela('dashboard')" data-page="dashboard">
+      <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="drawer-item" onclick="abrirTela('orcamento')" data-page="orcamento">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8zm0 4h5v2H8zm0-8h2v2H8z"/></svg>
+      <span>Orçamento</span>
+    </button>
+    <button class="drawer-item drawer-item-destaque" onclick="abrirTela('nova')" data-page="nova">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+      <span>Nova OS</span>
+    </button>
+    <button class="drawer-item" onclick="abrirTela('historico')" data-page="historico">
+      <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      <span>Histórico</span>
+    </button>
+    <button class="drawer-item" onclick="abrirTela('relatorios')" data-page="relatorios">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+      <span>Relatórios</span>
+    </button>
+    <button class="drawer-item" onclick="abrirTela('precos')" data-page="precos">
+      <svg viewBox="0 0 24 24"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
+      <span>Tabela de Preços</span>
+    </button>
+    <div class="drawer-divider"></div>
+    <button class="drawer-item" onclick="abrirTela('config')" data-page="config">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      <span>Configurações</span>
+    </button>
+  </nav>
+  <div class="drawer-footer">v5.0 · 100% offline</div>
+</aside>
+
+<div id="toast" class="toast"></div>
+
+<!-- MODAL EXCLUIR -->
+<div id="modal-overlay" class="modal-overlay" onclick="fecharModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-icon">🗑️</div>
+    <h3 class="modal-title">Excluir?</h3>
+    <p class="modal-desc">Essa ação não pode ser desfeita.</p>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-danger" onclick="confirmarExclusao()">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR OS -->
+<div id="modal-edit-overlay" class="modal-overlay" onclick="fecharModalEdit()">
+  <div class="modal modal-edit modal-scroll" onclick="event.stopPropagation()">
+    <h3 class="modal-title">✏️ Editar OS</h3>
+    <div class="edit-form">
+      <label class="input-label">Cliente</label>
+      <input id="edit-cliente" class="input-field" placeholder="Cliente">
+      <label class="input-label" style="margin-top:10px">WhatsApp</label>
+      <input id="edit-whatsapp" class="input-field" placeholder="Ex: 11999998888" type="tel">
+      <label class="input-label" style="margin-top:10px">Aparelho</label>
+      <input id="edit-aparelho" class="input-field" placeholder="Aparelho">
+      <label class="input-label" style="margin-top:10px">Serviço</label>
+      <input id="edit-servico" class="input-field" placeholder="Serviço">
+      <label class="input-label" style="margin-top:10px">Observações</label>
+      <textarea id="edit-obs" class="input-field textarea-field" placeholder="Defeito relatado, senha, combinados..."></textarea>
+      <label class="input-label" style="margin-top:10px">Status</label>
+      <select id="edit-status" class="input-field select-field">
+        <option value="andamento">🔧 Em andamento</option>
+        <option value="aguardando">⏳ Aguardando peça</option>
+        <option value="pronta">✅ Pronta para retirada</option>
+        <option value="entregue">📦 Entregue</option>
+      </select>
+    </div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn-secondary" onclick="fecharModalEdit()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarEdicao()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FOTO -->
+<div id="modal-foto-overlay" class="modal-overlay" onclick="fecharModalFoto()">
+  <div class="modal modal-foto" onclick="event.stopPropagation()">
+    <img id="modal-foto-img" src="" alt="Foto do aparelho">
+    <button class="btn-secondary" style="width:100%;margin-top:12px" onclick="fecharModalFoto()">Fechar</button>
+  </div>
+</div>
+
+<!-- MODAL PDF PREVIEW -->
+<div id="modal-pdf-overlay" class="modal-overlay" onclick="fecharModalPdf()">
+  <div class="modal modal-pdf" onclick="event.stopPropagation()">
+    <h3 class="modal-title">📄 Comprovante</h3>
+    <div id="pdf-preview-content"></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn-secondary" onclick="fecharModalPdf()">Fechar</button>
+      <button class="btn-primary" onclick="imprimirPdf()">🖨️ Imprimir / PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== DASHBOARD ========== -->
+<section id="dashboard" class="tela">
+  <div class="page-header">
+    <div>
+      <p class="page-sub">Visão geral</p>
+      <h1 class="page-title">Dashboard</h1>
+    </div>
+    <div class="period-selector">
+      <button class="period-btn active" onclick="setPeriodo('mes',this)">Mês</button>
+      <button class="period-btn" onclick="setPeriodo('semana',this)">Semana</button>
+      <button class="period-btn" onclick="setPeriodo('tudo',this)">Tudo</button>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="stat-card primary"><div class="stat-icon">💰</div><div class="stat-info"><span class="stat-label">Faturado</span><span class="stat-value" id="dash-faturamento">R$ 0,00</span></div></div>
+    <div class="stat-card success"><div class="stat-icon">📈</div><div class="stat-info"><span class="stat-label">Lucro Real</span><span class="stat-value" id="dash-lucro">R$ 0,00</span></div></div>
+    <div class="stat-card neutral"><div class="stat-icon">🔧</div><div class="stat-info"><span class="stat-label">Total OS</span><span class="stat-value" id="dash-total">0</span></div></div>
+    <div class="stat-card warning"><div class="stat-icon">🎯</div><div class="stat-info"><span class="stat-label">Ticket Médio</span><span class="stat-value" id="dash-ticket">R$ 0,00</span></div></div>
+  </div>
+
+  <!-- META MENSAL -->
+  <div id="dash-meta-wrap"></div>
+
+  <div class="section-title">Status das OS</div>
+  <div id="dash-status-bar"></div>
+
+  <div class="section-title" style="margin-top:24px">Evolução mensal</div>
+  <div class="chart-card">
+    <div id="grafico-mensal" class="bar-chart"></div>
+    <div id="grafico-empty" class="chart-empty" style="display:none">Nenhum dado ainda</div>
+  </div>
+
+  <div class="section-title" style="margin-top:24px">Últimas OS</div>
+  <div id="dash-recentes"></div>
+</section>
+
+<!-- ========== ORÇAMENTO ========== -->
+<section id="orcamento" class="tela" style="display:none">
+  <div class="page-header"><div><p class="page-sub">Gerar proposta</p><h1 class="page-title">Orçamento</h1></div></div>
+  <div class="form-card">
+    <div class="form-section-label">📋 Dados do Cliente</div>
+    <div class="input-group"><label class="input-label">Cliente *</label><input id="orc-cliente" class="input-field" placeholder="Nome do cliente" autocomplete="off"></div>
+    <div class="input-group"><label class="input-label">WhatsApp</label><input id="orc-whatsapp" class="input-field" placeholder="Ex: 11999998888" type="tel"></div>
+    <div class="input-group"><label class="input-label">Aparelho *</label><input id="orc-aparelho" class="input-field" placeholder="Ex: Samsung S20 FE" autocomplete="off"></div>
+    <div class="input-group"><label class="input-label">Tipo de Serviço *</label><input id="orc-servico" class="input-field" placeholder="Ex: Troca de tela" autocomplete="off"></div>
+    <div class="form-section-label" style="margin-top:16px">💵 Valores</div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">Valor da Peça (R$)</label><input id="orc-valorPeca" class="input-field" type="number" placeholder="0,00" min="0" step="0.01" oninput="previewOrc()"></div>
+      <div class="input-group"><label class="input-label">Tempo (min)</label><input id="orc-minutos" class="input-field" type="number" placeholder="0" min="0" oninput="previewOrc()"></div>
+    </div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">Transporte (R$)</label><input id="orc-transporte" class="input-field" type="number" placeholder="0,00" min="0" step="0.01" oninput="previewOrc()"></div>
+      <div class="input-group"><label class="input-label">Desconto (R$)</label><input id="orc-desconto" class="input-field" type="number" placeholder="0,00" min="0" step="0.01" oninput="previewOrc()"></div>
+    </div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">Pagamento</label><select id="orc-pagamento" class="input-field select-field" onchange="previewOrc()"><option value="dinheiro">💵 Dinheiro/Pix</option><option value="cartao">💳 Crédito</option><option value="debito">💳 Débito</option></select></div>
+      <div class="input-group"><label class="input-label">Validade (dias)</label><input id="orc-validade" class="input-field" type="number" placeholder="7" min="1" value="7"></div>
+    </div>
+    <div class="preview-box" id="orc-preview-box" style="display:none">
+      <div class="preview-row"><span>Valor do orçamento</span><span id="orc-prev-valor" class="preview-val">—</span></div>
+      <div class="preview-row"><span>Lucro estimado</span><span id="orc-prev-lucro" class="preview-val green">—</span></div>
+    </div>
+    <button class="btn-calc" onclick="salvarOrcamento()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+      Salvar Orçamento
+    </button>
+  </div>
+  <div class="section-title">Orçamentos salvos</div>
+  <div id="lista-orcamentos"></div>
+</section>
+
+<!-- ========== NOVA OS ========== -->
+<section id="nova" class="tela" style="display:none">
+  <div class="page-header"><div><p class="page-sub">Registrar atendimento</p><h1 class="page-title">Nova OS</h1></div></div>
+  <div class="form-card">
+    <div class="form-section-label">📋 Dados do Cliente</div>
+    <div class="input-group"><label class="input-label">Cliente *</label><input id="cliente" class="input-field" placeholder="Nome do cliente" autocomplete="off"></div>
+    <div class="input-group"><label class="input-label">WhatsApp (opcional)</label><input id="whatsapp" class="input-field" placeholder="Ex: 11999998888" type="tel"></div>
+    <div class="input-group"><label class="input-label">Aparelho *</label><input id="aparelho" class="input-field" placeholder="Ex: Samsung S20 FE" autocomplete="off"></div>
+    <div class="input-group"><label class="input-label">Observações (defeito, senha, combinados...)</label><textarea id="obs" class="input-field textarea-field" placeholder="Ex: Tela com linha, senha 1234, cliente busca sexta..."></textarea></div>
+
+    <!-- SERVIÇOS MÚLTIPLOS -->
+    <div class="form-section-label" style="margin-top:4px">🛠️ Serviços</div>
+    <div id="servicos-lista"></div>
+    <button class="btn-add-servico" onclick="adicionarServico()">+ Adicionar serviço</button>
+
+    <div class="input-group" style="margin-top:12px">
+      <label class="input-label">📷 Foto do aparelho (opcional)</label>
+      <div class="foto-area" id="foto-area" onclick="document.getElementById('foto-input').click()">
+        <input type="file" id="foto-input" accept="image/*" capture="environment" style="display:none" onchange="carregarFoto(this)">
+        <div id="foto-placeholder" class="foto-placeholder">
+          <svg viewBox="0 0 24 24"><path d="M12 15.2c-1.77 0-3.2-1.43-3.2-3.2s1.43-3.2 3.2-3.2 3.2 1.43 3.2 3.2-1.43 3.2-3.2 3.2zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+          <span>Toque para tirar foto</span>
+        </div>
+        <img id="foto-preview" src="" alt="" class="foto-img" style="display:none">
+      </div>
+      <button id="foto-remove-btn" class="btn-remove-foto" style="display:none" onclick="removerFoto(event)">✕ Remover foto</button>
+    </div>
+
+    <div class="form-section-label" style="margin-top:4px">💵 Valores Gerais</div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">Transporte (R$)</label><input id="transporte" class="input-field" type="number" placeholder="0,00" min="0" step="0.01" oninput="previewCalc()"></div>
+      <div class="input-group"><label class="input-label">Desconto (R$)</label><input id="desconto" class="input-field" type="number" placeholder="0,00" min="0" step="0.01" oninput="previewCalc()"></div>
+    </div>
+    <div class="input-group"><label class="input-label">Forma de Pagamento</label>
+      <select id="pagamento" class="input-field select-field" onchange="previewCalc()">
+        <option value="dinheiro">💵 Dinheiro / Pix</option>
+        <option value="cartao">💳 Cartão de Crédito</option>
+        <option value="debito">💳 Cartão de Débito</option>
+      </select>
+    </div>
+
+    <div class="preview-box" id="preview-box" style="display:none">
+      <div class="preview-row"><span>Valor estimado</span><span id="prev-valor" class="preview-val">—</span></div>
+      <div class="preview-row"><span>Lucro estimado</span><span id="prev-lucro" class="preview-val green">—</span></div>
+    </div>
+
+    <button class="btn-calc" onclick="calcularOS()">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+      Calcular e Salvar OS
+    </button>
+  </div>
+  <div id="resultado" class="resultado-card" style="display:none"></div>
+</section>
+
+<!-- ========== HISTÓRICO ========== -->
+<section id="historico" class="tela" style="display:none">
+  <div class="page-header"><div><p class="page-sub">Todos os atendimentos</p><h1 class="page-title">Histórico</h1></div></div>
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <input id="search-input" class="search-input" placeholder="Buscar por cliente ou aparelho..." oninput="filtrarHistorico()">
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFiltroData('tudo',this)">Tudo</button>
+    <button class="filter-btn" onclick="setFiltroData('hoje',this)">Hoje</button>
+    <button class="filter-btn" onclick="setFiltroData('semana',this)">Semana</button>
+    <button class="filter-btn" onclick="setFiltroData('mes',this)">Mês</button>
+    <button class="filter-btn" onclick="setFiltroData('andamento',this)">🔧 Andamento</button>
+    <button class="filter-btn" onclick="setFiltroData('aguardando',this)">⏳ Aguardando</button>
+    <button class="filter-btn" onclick="setFiltroData('pronta',this)">✅ Prontas</button>
+  </div>
+  <div id="lista"></div>
+</section>
+
+<!-- ========== RELATÓRIOS ========== -->
+<section id="relatorios" class="tela" style="display:none">
+  <div class="page-header"><div><p class="page-sub">Análise de desempenho</p><h1 class="page-title">Relatórios</h1></div></div>
+  <div id="relatorios-content"></div>
+</section>
+
+<!-- ========== TABELA DE PREÇOS ========== -->
+<section id="precos" class="tela" style="display:none">
+  <div class="page-header"><div><p class="page-sub">Serviços cadastrados</p><h1 class="page-title">Tabela de Preços</h1></div></div>
+  <div class="form-card">
+    <div class="form-section-label">➕ Novo serviço</div>
+    <div class="input-group"><label class="input-label">Nome do Serviço</label><input id="preco-nome" class="input-field" placeholder="Ex: Troca de tela S20 FE"></div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">Valor da Peça (R$)</label><input id="preco-peca" class="input-field" type="number" placeholder="0,00" min="0" step="0.01"></div>
+      <div class="input-group"><label class="input-label">Tempo (min)</label><input id="preco-minutos" class="input-field" type="number" placeholder="0" min="0"></div>
+    </div>
+    <button class="btn-calc" onclick="adicionarPreco()">+ Adicionar à tabela</button>
+  </div>
+  <div class="section-title">Serviços cadastrados</div>
+  <div id="lista-precos"></div>
+</section>
+
+<!-- ========== CONFIG ========== -->
+<section id="config" class="tela" style="display:none">
+  <div class="page-header"><div><p class="page-sub">Personalize os cálculos</p><h1 class="page-title">Configurações</h1></div></div>
+  <div class="form-card">
+    <div class="form-section-label">🏪 Dados da Loja</div>
+    <div class="input-group"><label class="input-label">Nome da Loja / Técnico</label><input id="nomeLoja" class="input-field" placeholder="Ex: TechFix Assistência"></div>
+    <div class="input-group"><label class="input-label">WhatsApp da Loja</label><input id="whatsappLoja" class="input-field" placeholder="Ex: 11999998888" type="tel"></div>
+
+    <div class="form-section-label" style="margin-top:20px">⏱️ Mão de Obra</div>
+    <div class="input-group"><label class="input-label">Valor por Hora (R$)</label><input id="valorHora" class="input-field" type="number" placeholder="Ex: 80" min="0" step="0.01"></div>
+
+    <div class="form-section-label" style="margin-top:20px">📊 Margens e Taxas</div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">Margem de Lucro (%)</label><input id="margem" class="input-field" type="number" placeholder="Ex: 30" min="0"></div>
+      <div class="input-group"><label class="input-label">Taxa Cartão Crédito (%)</label><input id="taxaCartao" class="input-field" type="number" placeholder="Ex: 3.5" min="0" step="0.01"></div>
+    </div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">Taxa Cartão Débito (%)</label><input id="taxaDebito" class="input-field" type="number" placeholder="Ex: 1.5" min="0" step="0.01"></div>
+      <div class="input-group"><label class="input-label">Comissão (%)</label><input id="comissao" class="input-field" type="number" placeholder="Ex: 10" min="0" step="0.01"></div>
+    </div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">Fundo de Garantia (%)</label><input id="fundo" class="input-field" type="number" placeholder="Ex: 5" min="0" step="0.01"></div>
+      <div class="input-group"><label class="input-label">Mínimo sobre Peça (%)</label><input id="minimoPeca" class="input-field" type="number" placeholder="Ex: 100" min="0"></div>
+    </div>
+
+    <div class="form-section-label" style="margin-top:20px">🏢 Custos Fixos</div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">Custo Fixo Mensal (R$)</label><input id="custoFixo" class="input-field" type="number" placeholder="Ex: 2000" min="0"></div>
+      <div class="input-group"><label class="input-label">Meta OS/mês</label><input id="metaOS" class="input-field" type="number" placeholder="Ex: 40" min="1"></div>
+    </div>
+    <div class="input-group"><label class="input-label">Insumos por OS (R$)</label><input id="insumos" class="input-field" type="number" placeholder="Ex: 4" min="0" step="0.01"></div>
+
+    <button class="btn-calc" onclick="salvarConfig()">
+      <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm2 16H5V5h11.17L19 7.83V19zm-7-7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM6 6h9v4H6z"/></svg>
+      Salvar Configurações
+    </button>
+
+    <div class="form-section-label" style="margin-top:28px">💾 Backup de Dados</div>
+    <p class="backup-desc">Exporte para não perder nada. Importe em outro celular também.</p>
+    <div class="backup-btns">
+      <button class="btn-backup export" onclick="exportarDados()"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Exportar backup</button>
+      <button class="btn-backup import" onclick="document.getElementById('import-input').click()"><svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>Importar backup</button>
+      <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarDados(this)">
+    </div>
+    <div class="form-section-label" style="margin-top:28px">🔄 Atualização do App</div>
+    <p class="backup-desc">Versão atual: <strong id="app-versao">v13</strong> · Se o app estiver desatualizado após uma nova versão, use o botão abaixo.</p>
+    <div class="backup-btns">
+      <button class="btn-backup export" onclick="verificarAtualizacao()" id="btn-update" style="width:100%">🔄 Verificar e aplicar atualização</button>
+    </div>
+    <div id="update-status" style="font-size:12px;color:var(--text3);margin-top:8px;text-align:center"></div>
+
+    <div class="danger-zone">
+      <div class="form-section-label" style="color:#ef4444">⚠️ Zona de Perigo</div>
+      <button class="btn-danger-outline" onclick="limparTodosDados()">🗑️ Apagar todos os dados</button>
+    </div>
+  </div>
+</section>
+
+<!-- PRINT AREA (hidden) -->
+<div id="print-area" style="display:none"></div>
+
+<!-- MODAL QR TESTE -->
+<div id="modal-qr-overlay" class="modal-overlay" onclick="fecharModalQR()">
+  <div class="modal modal-qr" onclick="event.stopPropagation()">
+    <h3 class="modal-title">📱 QR de Teste</h3>
+    <p class="modal-qr-desc">Escaneie com o aparelho consertado para iniciar os testes</p>
+    <div id="qr-container" class="qr-container"></div>
+    <div id="qr-link-wrap" style="margin-top:10px;font-size:11px;color:var(--text3);text-align:center;word-break:break-all"></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn-secondary" onclick="fecharModalQR()">Fechar</button>
+      <button class="btn-primary" onclick="abrirTesteInterno()">▶ Testar aqui</button>
+    </div>
+  </div>
+</div>
+
+<!-- IFRAME TESTE — roda teste.html dentro do app, mesmo localStorage -->
+<div id="iframe-teste-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:#0f172a;flex-direction:column">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#1e293b;border-bottom:1px solid #334155;flex-shrink:0">
+    <span style="font-size:14px;font-weight:700">🔬 Teste de Aparelho</span>
+    <button onclick="fecharTesteInterno()" style="background:#ef4444;border:none;color:#fff;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">✕ Fechar</button>
+  </div>
+  <iframe id="iframe-teste" src="" style="flex:1;border:none;width:100%;height:100%" allow="camera;microphone;accelerometer;gyroscope;vibrate"></iframe>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="storage.js?v=13"></script>
+<script src="calc.js?v=13"></script>
+<script src="app.js?v=13"></script>
+</body>
+</html>
