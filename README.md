@@ -10,7 +10,7 @@
 - 🌐 Funciona **sem internet**
 
 ## 🚀 Demo Ao Vivo
-[![Demo](https://lucrutechpro.netlify.app)](https://lucrutechpro.netlify.app)
+[![Demo](https://lucrutechpro.netlify.app/)](https://lucrutechpro.netlify.app/)
 
 ## 📱 Instalação
 1. Acesse [lucrutechpro.netlify.app](https://lucrotechpro.netlify.app/)
