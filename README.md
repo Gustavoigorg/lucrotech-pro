@@ -1,4 +1,4 @@
-g# 💰 LucroTech PRO
+# 💰 LucroTech PRO
 
 **PWA Offline-First** para gestão financeira de assistências técnicas.
 
